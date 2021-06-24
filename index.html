@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
+		<style> 
+			.grid-container {
+				display: inline-grid;
+				grid-template-columns: auto auto auto auto auto;
+				grid-gap: 0px;
+				background-color: #2196F3;
+				padding: 0px;
+			}
+			.grid-container2 {
+				display: inline-grid;
+				grid-template-columns: auto auto auto;
+				grid-gap: 0px;
+				background-color: #2196F3;
+				padding: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Kalkyl</h1>
+		<input type="button" value="+" onclick="fAddRow()"><input type="button" value="-" onclick="fRemoveRow()"><br>
+		<div class="grid-container" id="wMain"></div><br><br>
+		<h3>Resultat</h3>
+		<div class="grid-container2" id="wResult">
+			<div><input value="Total"></div><div><input value="Antal Portioner"></div><div><input value="Kostnad per Portion"></div>
+			<div><input id="rTotal"></div><div><input type="number" min="1" id="rUnits" onchange="fCalculateCost()" value="4"></div><div><input id="rCostPerUnit"></div>
+		</div>
+		<script>
+			let dataTable = [];
+			function fAddRow() {
+				dataTable.push(['-', '0', '0', '0', '0']);
+				fDrawTable();
+				fCalculateCost();
+			}
+			function fRemoveRow() {
+				dataTable.pop();
+				fDrawTable();
+				fCalculateCost();
+			}
+			function fCellChange(r, c) {
+				dataTable[r][c] = document.getElementById(r + "." + c).value;
+				fCalculateCost();
+			}
+			function fMakeTable() {
+				dataTable.push(['Vetemjöl', '13.90', '2 kg', '0.3 kg', '0']);
+				dataTable.push(['Bakpulver', '12.90', '225 g', '1 g', '0']);
+				dataTable.push(['Salt', '7.90', '500 g', '1 g', '0']);
+				dataTable.push(['Vatten', '0', '0', '6 dl', '0']);			
+			}
+			function fDrawTable() {
+				document.getElementById("wMain").innerHTML = '<input value="Ingrediens"><input value="Pris"><input value="Mängd"><input value="Använt"><input value="Kostnad">';
+				for (let r = 0; r < dataTable.length ; r++) {
+					for (let c = 0; c < 5 ; c++) {
+						document.getElementById("wMain").innerHTML += '<input value="' + dataTable[r][c] + '" id="' + r + "." + c + '" onchange="fCellChange(' + r + ", " + c + ')">';
+					}
+				}
+			}
+			function fCalculateCost() {
+				let total = 0;
+				for (let r = 0; r < dataTable.length ; r++) {
+					let price = parseFloat(dataTable[r][1]);
+					let amount = parseFloat(dataTable[r][2]);
+					let used = parseFloat(dataTable[r][3]);
+					let cost = +((price/amount)*used).toPrecision(3);
+					if (isNaN(cost)) { cost = 0; }
+					document.getElementById(r + "." + 4).value = cost;
+					dataTable[r][4] = cost;
+					total += cost;
+				}
+				total = +(total).toPrecision(3);
+				document.getElementById("rTotal").value = total;
+				document.getElementById("rCostPerUnit").value = +(total/parseFloat(document.getElementById("rUnits").value)).toPrecision(3);
+			}
+			fMakeTable();
+			fDrawTable();
+			fCalculateCost()
+		</script>
+	</body>
+</html>
